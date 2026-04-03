@@ -7,6 +7,11 @@ allowed-tools: Bash, Read, Write
 
 The user just switched to this machine and wants to restore the work context from the previous machine.
 
+**Recovery priority:**
+1. Current `handoff.md` has content → show it directly
+2. File is empty or cleared (contains `# restored`) → auto-fallback to the most recent handoff entry in git history, shown with note "(from history)"
+3. No git history either → tell the user no record was found
+
 ## Task
 
 1. Attempt to pull latest content (if `~/.claude` is a git repo):
@@ -18,8 +23,16 @@ The user just switched to this machine and wants to restore the work context fro
 
 2. Read `~/.claude/handoff.md`
 
-3. If the file doesn't exist, is empty, or only contains `# restored`, tell the user:
-   "No handoff record found. The other machine may not have run `/handoff` yet."
+3. If the file does not exist, is empty, or only contains `# restored`, fall back to git history:
+   ```bash
+   git -C ~/.claude log --oneline -- handoff.md 2>/dev/null | grep "handoff: save" | head -1 | awk '{print $1}'
+   ```
+   Use the resulting commit hash to retrieve the content:
+   ```bash
+   git -C ~/.claude show {commit_hash}:handoff.md 2>/dev/null
+   ```
+   - If content is found, display it normally but append **(from history)** after the snapshot title
+   - If git history has nothing either, tell the user: "No handoff record found. The other machine may not have run `/handoff` yet."
 
 4. If the file exists and has content, present it to the user:
 
