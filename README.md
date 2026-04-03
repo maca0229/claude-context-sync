@@ -22,6 +22,7 @@ Switch between machines without losing your work context.
 
 **`/handoff`** — Run before switching machines. Claude summarizes your current work state into a snapshot and syncs it automatically (if `~/.claude` is a git repo).
 
-**`/resume`** — Run after switching machines. Claude pulls the latest snapshot and tells you exactly where you left off.
+**`/resume`** — Run after switching machines. Claude pulls the latest snapshot and tells you exactly where you left off. If the snapshot was already cleared, it automatically retrieves the most recent entry from git history.
 
 **Works best with** `~/.claude` synced via git (e.g. to a private GitHub repo). Without git, the snapshot is saved locally at `~/.claude/handoff.md` and can be manually transferred.
+
